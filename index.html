@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Secure Messaging System</title>
+</head>
+<body>
+
+<h2>Secure Message Console</h2>
+
+<p>Enter message to send:</p>
+
+<input id="msg" placeholder="type message">
+<button onclick="sendMessage()">Send</button>
+
+<p id="status"></p>
+
+<script>
+
+const TOKEN = "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";
+const REPO = "agatherum/ctf-message-leak";
+
+// Hidden flag (THIS is what players must find)
+const FLAG = "itc266{235490d3f34t3d2375}";
+
+async function sendMessage() {
+  const userInput = document.getElementById("msg").value;
+
+  // Message intentionally leaks flag
+  const fullMessage = {
+    user_message: userInput,
+    debug_flag: FLAG,
+    timestamp: Date.now()
+  };
+
+  const response = await fetch(`https://api.github.com/repos/${REPO}/issues`, {
+    method: "POST",
+    headers: {
+      "Authorization": "token " + TOKEN,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      title: "CTF Message",
+      body: JSON.stringify(fullMessage)
+    })
+  });
+
+  document.getElementById("status").innerText = "Message sent!";
+}
+
+</script>
+
+</body>
+</html>
