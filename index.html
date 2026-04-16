@@ -19,35 +19,44 @@
 
 <script>
 
-const TOKEN = "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";
-const REPO = "agatherum/ctf-message-leak";
+const TOKEN = "YOUR_TOKEN";
+const REPO = "YOUR_USERNAME/ctf-message-leak";
 
-// Hidden flag (THIS is what players must find)
-const FLAG = "itc266{235490d3f34t3d2375}";
+async function getFlag() {
+  const res = await fetch("flag.txt");
+  return await res.text();
+}
 
 async function sendMessage() {
-  const userInput = document.getElementById("msg").value;
+  try {
+    const userInput = document.getElementById("msg").value;
 
-  // Message intentionally leaks flag
-  const fullMessage = {
-    user_message: userInput,
-    debug_flag: FLAG,
-    timestamp: Date.now()
-  };
+    // Fetch flag dynamically
+    const flag = await getFlag();
 
-  const response = await fetch(`https://api.github.com/repos/${REPO}/issues`, {
-    method: "POST",
-    headers: {
-      "Authorization": "token " + TOKEN,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      title: "CTF Message",
-      body: JSON.stringify(fullMessage)
-    })
-  });
+    const fullMessage = {
+      user_message: userInput,
+      debug_flag: flag.trim(),
+      timestamp: Date.now()
+    };
 
-  document.getElementById("status").innerText = "Message sent!";
+    const response = await fetch(`https://api.github.com/repos/${REPO}/issues`, {
+      method: "POST",
+      headers: {
+        "Authorization": "token " + TOKEN,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        title: "CTF Message",
+        body: JSON.stringify(fullMessage)
+      })
+    });
+
+    document.getElementById("status").innerText = "Message sent!";
+  } catch (err) {
+    console.error(err);
+    document.getElementById("status").innerText = "Error sending message";
+  }
 }
 
 </script>
